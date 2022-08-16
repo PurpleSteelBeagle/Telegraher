@@ -23,6 +23,9 @@ jobs:
       - name: sha256 basic apk
         run: echo "::set-output name=SHA256BASIC::$(sha256sum ./TMessagesProj/build/outputs/apk/${{ env.AARCH }}/release/app.apk|head -c 64)"
         id: sha256_basic
+      - name: Get Hash
+        id: hash
+        run: echo "git_hash=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_HASH
       - name: release
         uses: actions/create-release@v1
         id: create_release
@@ -30,8 +33,8 @@ jobs:
           draft: false
           prerelease: false
           release_name: ${{ env.RNAME }} (${{ env.AARCH }})
-          tag_name: ${{ env.TNAME }}${{ env.AARCH }}
-          body: ${{ env.ANAME }}${{ env.AARCH }}.apk (sha256 `${{ steps.sha256_basic.outputs.SHA256BASIC }}`)
+          tag_name: ${{ env.TNAME }}${{ env.hash }}_${{ env.AARCH }}
+          body: ${{ env.ANAME }}_${{ env.hash }}_${{ env.AARCH }}.apk (sha256 `${{ steps.sha256_basic.outputs.SHA256BASIC }}`)
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: upload apk basic
@@ -41,10 +44,10 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./TMessagesProj/build/outputs/apk/${{ env.AARCH }}/release/app.apk
-          asset_name: ${{ env.ANAME }}${{ env.AARCH }}.apk
+          asset_name: ${{ env.ANAME }}_${{ env.hash }}_${{ env.AARCH }}.apk
           asset_content_type: application/gzip
     env:
-      RNAME: Telegraher 8.85.37
-      TNAME: noshit_8.85.37_1
-      ANAME: Telegraher.8.85.37.
+      RNAME: Telegraher
+      TNAME: test_
+      ANAME: Telegraher
       AARCH: arm64_v8a
