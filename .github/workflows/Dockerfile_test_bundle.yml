@@ -16,6 +16,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Get Hash
+        id: hash
+        run: echo "git_hash=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_HASH
       - name: build docker
         run: docker build -t telegraher-${{ env.AARCH }} -f Dockerfile_${{ env.AARCH }} .
       - name: build app
