@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
       - name: Get Hash
         id: hash
-        run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-6)" >> $GITHUB_ENV
+        run: echo "GITHUB_SHA_SHORT=$(echo $GITHUB_SHA | cut -c 1-7)" >> $GITHUB_ENV
       - name: build docker
         run: docker build -t telegraher-${{ env.AARCH }} -f Dockerfile_${{ env.AARCH }} .
       - name: build app
