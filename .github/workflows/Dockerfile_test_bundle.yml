@@ -30,8 +30,8 @@ jobs:
           draft: false
           prerelease: false
           release_name: ${{ env.RNAME }} (${{ env.AARCH }})
-          tag_name: ${{ env.TNAME }}${{ env.AARCH }}
-          body: BETA Bundle (`arm64_v8a`/`armeabi_v7a`/`x86`/`x86_64`)  ${{ env.ANAME }}${{ env.AARCH }}.apk (sha256 `${{ steps.sha256_basic.outputs.SHA256BASIC }}`)
+          tag_name: ${{ env.TNAME }}${{ env.hash }}_${{ env.AARCH }}
+          body: BETA Bundle (`arm64_v8a`/`armeabi_v7a`/`x86`/`x86_64`) ${{ env.ANAME }}_${{ env.hash }}_${{ env.AARCH }}.apk (sha256 `${{ steps.sha256_basic.outputs.SHA256BASIC }}`)
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: upload apk basic
@@ -41,10 +41,10 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./TMessagesProj/build/outputs/apk/${{ env.AARCH }}/release/app.apk
-          asset_name: ${{ env.ANAME }}${{ env.AARCH }}.apk
+          asset_name: ${{ env.ANAME }}_${{ env.hash }}_${{ env.AARCH }}.apk
           asset_content_type: application/gzip
     env:
-      RNAME: Telegraher TEST 8.85.37
-      TNAME: noshit_8.85.37_1
-      ANAME: Telegraher.TEST.8.85.37.
+      RNAME: Telegraher
+      TNAME: noshit_
+      ANAME: Telegraher
       AARCH: bundle
