@@ -16,6 +16,9 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: Get Hash
+        id: hash
+        run: echo "git_hash=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_HASH
       - name: build docker
         run: docker build -t telegraher-${{ env.AARCH }} -f Dockerfile_${{ env.AARCH }} .
       - name: build app
@@ -23,9 +26,6 @@ jobs:
       - name: sha256 basic apk
         run: echo "::set-output name=SHA256BASIC::$(sha256sum ./TMessagesProj/build/outputs/apk/${{ env.AARCH }}/release/app.apk|head -c 64)"
         id: sha256_basic
-      - name: Get Hash
-        id: hash
-        run: echo "git_hash=$(git rev-parse --short "$GITHUB_SHA")" >> $GITHUB_HASH
       - name: release
         uses: actions/create-release@v1
         id: create_release
