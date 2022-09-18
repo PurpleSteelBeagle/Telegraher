@@ -1,5 +1,31 @@
 # Changes
 
+* 8.85.47
+    * hide deletion marks fix
+    * added persian translation, thanks to OxMohsen
+    * forwarded message real time fix
+    * seconds added to message history
+* 8.85.46
+    * "clear db" is disabled cause we need to rework vanilla code (we don't use journal/wal)
+    * "delete downloaded file" also works for videos & music
+    * history message now use default font size from the app
+        * default for dates, `-2` for the texts
+    * you can change sticker size now: x0.25, x0.5, x1 & x2
+    * you can enable real forwarded message time
+    * you can hide stickers in chats
+        * alpha version, they are still in cache, still takes place in ui (just a white element)
+        * but they are not rendered :)
+* 8.85.45
+    * we compress libs, so APK should be smaller, but installation longer.
+        * "Gplay optimisations failed"? well we're not on gplay.
+    * graherium speedup now separated for upload & download
+        * cause some folks are facing issues with uploads)
+    * arabic translations are added, thanks to RHineix
+    * graherium connection speed override is added. You can keep it `auto`, setup `slow` or be `high` 😎
+        * with this you can send files realllly faster or use network less than usually being on wifi
+        * it doesn't override your autodownloads presets, so be smart
+    * Privacy "don't use Apple" is added and enabled by default
+        * cause telegram app use itunes to pick the covers. If you need it - just disable the feature
 * 8.85.44
     * 40, 41, 42, 43, 44 - due new flow debugging
     * release

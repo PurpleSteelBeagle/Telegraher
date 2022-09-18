@@ -73,6 +73,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.graphics.ColorUtils;
 
+import com.evildayz.code.telegraher.ThePenisMightierThanTheSword;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -5860,7 +5861,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         }
                         additionHeight += reactionsLayoutInBubble.totalHeight;
                     }
-                } else if (messageObject.isAnyKindOfSticker()) {
+                } else if (!MessagesController.getGlobalTelegraherSettings().getBoolean("HideStickers", false) && messageObject.isAnyKindOfSticker()) {
                     drawBackground = false;
                     boolean isWebpSticker = messageObject.type == MessageObject.TYPE_STICKER;
                     for (int a = 0; a < messageObject.getDocument().attributes.size(); a++) {
@@ -5887,22 +5888,23 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         maxHeight = maxWidth = (int) (Math.min(getParentWidth(), AndroidUtilities.displaySize.y) * 0.5f);
                     }
                     String filter;
-                    if (messageObject.isAnimatedEmoji() || messageObject.isDice()) {
-                        float zoom = MessagesController.getInstance(currentAccount).animatedEmojisZoom;
-                        photoWidth = (int) ((photoWidth / 512.0f) * maxWidth * zoom);
-                        photoHeight = (int) ((photoHeight / 512.0f) * maxHeight * zoom);
-                    } else {
-                        if (photoWidth == 0) {
-                            photoHeight = (int) maxHeight;
-                            photoWidth = photoHeight + AndroidUtilities.dp(100);
-                        }
-                        photoHeight *= maxWidth / (float) photoWidth;
-                        photoWidth = (int) maxWidth;
-                        if (photoHeight > maxHeight) {
-                            photoWidth *= maxHeight / photoHeight;
-                            photoHeight = (int) maxHeight;
-                        }
+//                    if (messageObject.isAnimatedEmoji() || messageObject.isDice()) {
+//                        float zoom = MessagesController.getInstance(currentAccount).animatedEmojisZoom;
+//                        photoWidth = (int) ((photoWidth / 512.0f) * maxWidth * zoom);
+//                        photoHeight = (int) ((photoHeight / 512.0f) * maxHeight * zoom);
+//                    } else {
+                    if (photoWidth == 0) {
+                        photoHeight = (int) maxHeight;
+                        photoWidth = photoHeight + AndroidUtilities.dp(100);
                     }
+                    photoHeight *= maxWidth / (float) photoWidth;
+                    photoHeight /= ThePenisMightierThanTheSword.stickerSizeMult();
+                    photoWidth = (int) (maxWidth / ThePenisMightierThanTheSword.stickerSizeMult());
+                    if (photoHeight > maxHeight) {
+                        photoWidth *= maxHeight / photoHeight;
+                        photoHeight = (int) maxHeight;
+                    }
+                    //}
                     Object parentObject = messageObject;
                     int w = (int) (photoWidth / AndroidUtilities.density);
                     int h = (int) (photoHeight / AndroidUtilities.density);
@@ -5982,7 +5984,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                         additionHeight += reactionsLayoutInBubble.totalHeight;
                         reactionsLayoutInBubble.positionOffsetY += AndroidUtilities.dp(4);
                     }
-                } else {
+                } else if (!messageObject.isAnyKindOfSticker()) {
                     currentPhotoObject = FileLoader.getClosestPhotoSizeWithSize(messageObject.photoThumbs, AndroidUtilities.getPhotoSize());
                     photoParentObject = messageObject.photoThumbsObject;
                     boolean useFullWidth = false;
@@ -10603,7 +10605,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
             timeString = LocaleController.getString("SponsoredMessage", R.string.SponsoredMessage);
         } else if (currentMessageObject.scheduled && currentMessageObject.messageOwner.date == 0x7FFFFFFE) {
             timeString = "";
-        } else if (edited || deleted) {
+        } else if (edited || (deleted && MessagesController.getTelegraherSettings(currentAccount).getBoolean("EnableChatDeleteMark", true))) {
             timeString = (deleted ? LocaleController.getString("DeletedMessage", R.string.DeletedMessage) : LocaleController.getString("EditedMessage", R.string.EditedMessage)) + " " + LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
         } else {
             timeString = LocaleController.getInstance().formatterDay.format((long) (messageObject.messageOwner.date) * 1000);
@@ -10927,7 +10929,12 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                 }
 
                 forwardedNameWidth = getMaxNameWidth();
-                String forwardedString = getForwardedMessageText(messageObject);
+                String forwardedString;
+                if (MessagesController.getGlobalTelegraherSettings().getBoolean("RealForwardedMessageTime", true)) {
+                    forwardedString = String.format("¶ %s", LocaleController.formatDateBitch(messageObject.messageOwner.fwd_from.date, false));
+                } else {
+                    forwardedString = getForwardedMessageText(messageObject);
+                }
                 if (hasPsaHint) {
                     forwardedNameWidth -= AndroidUtilities.dp(36);
                 }
@@ -16238,7 +16245,7 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     changed = true;
                 }
             }
-            if ((edited || deleted) && !lastDrawingEdited && timeLayout != null) {
+            if ((edited || (deleted && MessagesController.getTelegraherSettings(currentAccount).getBoolean("EnableChatDeleteMark", true))) && !lastDrawingEdited && timeLayout != null) {
                 String editedStr = deleted ? LocaleController.getString("DeletedMessage", R.string.DeletedMessage) : LocaleController.getString("EditedMessage", R.string.EditedMessage);
                 String text = timeLayout.getText().toString();
                 int i = text.indexOf(editedStr);
